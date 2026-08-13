@@ -54,7 +54,3 @@ Morning water:
 Tracking:
 Posture or face work:
 ```
-
-## Safety Note
-
-This is coaching guidance, not medical advice. Stop and consult a professional if pain, dizziness, fainting, or severe fatigue occurs.
