@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>减脂跟踪看板</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6f5;
+      --surface: #ffffff;
+      --surface-2: #eef2f0;
+      --text: #1f2421;
+      --muted: #66716b;
+      --border: #d7deda;
+      --accent: #1f8a70;
+      --accent-strong: #146b55;
+      --danger: #b4443b;
+      --warning: #b7791f;
+      --radius: 8px;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151a18;
+        --surface: #1d2421;
+        --surface-2: #242d29;
+        --text: #edf2ef;
+        --muted: #a9b4ae;
+        --border: #37413c;
+        --accent: #62c7a9;
+        --accent-strong: #8adcc4;
+        --danger: #e1847b;
+        --warning: #e6b85c;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    button.danger {
+      color: var(--danger);
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 18px 16px 36px;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .profile {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      color: var(--muted);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric-value {
+      font-size: 24px;
+      font-weight: 500;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .chart-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .swatch.weight {
+      background: var(--accent);
+    }
+
+    .swatch.fat {
+      background: var(--warning);
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 300px;
+    }
+
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+      white-space: nowrap;
+      z-index: 2;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 20px;
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 8px;
+      min-height: 38px;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 64px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    details {
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      padding: 0 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 10px 0;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    @media (max-width: 900px) {
+      .metrics,
+      .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        padding: 14px 10px 28px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .metrics,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        width: 100%;
+      }
+
+      button {
+        flex: 1 1 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>减脂跟踪看板</h1>
+      <div class="actions">
+        <input id="fileInput" type="file" accept=".json,application/json" hidden>
+        <button id="importButton" type="button">导入 JSON</button>
+        <button id="exportJsonButton" type="button">导出 JSON</button>
+        <button id="exportCsvButton" type="button">导出 CSV</button>
+        <button id="sampleButton" type="button">载入示例</button>
+        <button id="clearButton" type="button" class="danger">清空</button>
+      </div>
+    </header>
+
+    <section class="section" id="profileSection">
+      <div class="profile" id="profileText"></div>
+    </section>
+
+    <section class="section">
+      <div class="metrics" id="metrics"></div>
+    </section>
+
+    <section class="section">
+      <div class="chart-panel">
+        <div class="chart-header">
+          <span>体重与体脂趋势</span>
+          <div class="legend">
+            <span class="legend-item"><span class="swatch weight"></span>体重 kg</span>
+            <span class="legend-item"><span class="swatch fat"></span>体脂率 %</span>
+          </div>
+        </div>
+        <div class="chart-wrap" id="chartWrap">
+          <canvas id="chartCanvas"></canvas>
+          <div class="tooltip" id="chartTooltip"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">新增或更新记录</h2>
+      <form id="recordForm">
+        <div class="form-grid">
+          <div class="field">
+            <label for="date">日期</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+          <div class="field">
+            <label for="weight_kg">体重 kg</label>
+            <input id="weight_kg" name="weight_kg" type="number" step="0.1" required>
+          </div>
+          <div class="field">
+            <label for="body_fat_pct">体脂率 %</label>
+            <input id="body_fat_pct" name="body_fat_pct" type="number" step="0.1">
+          </div>
+          <div class="field">
+            <label for="waist_cm">腰围 cm</label>
+            <input id="waist_cm" name="waist_cm" type="number" step="0.1">
+          </div>
+          <div class="field">
+            <label for="neck_cm">颈围 cm</label>
+            <input id="neck_cm" name="neck_cm" type="number" step="0.1">
+          </div>
+          <div class="field">
+            <label for="sleep_hours">睡眠小时</label>
+            <input id="sleep_hours" name="sleep_hours" type="number" step="0.1">
+          </div>
+          <div class="field">
+            <label for="water_ml">饮水 ml</label>
+            <input id="water_ml" name="water_ml" type="number" step="50">
+          </div>
+          <div class="field">
+            <label for="fasting_window_hours">断食窗口小时</label>
+            <input id="fasting_window_hours" name="fasting_window_hours" type="number" step="0.5">
+          </div>
+        </div>
+
+        <details>
+          <summary>更多指标</summary>
+          <div class="form-grid">
+            <div class="field">
+              <label for="steps">步数</label>
+              <input id="steps" name="steps" type="number" step="100">
+            </div>
+            <div class="field">
+              <label for="training_minutes">训练分钟</label>
+              <input id="training_minutes" name="training_minutes" type="number" step="5">
+            </div>
+            <div class="field">
+              <label for="protein_g">蛋白质 g</label>
+              <input id="protein_g" name="protein_g" type="number" step="1">
+            </div>
+            <div class="field">
+              <label for="calories">摄入 kcal</label>
+              <input id="calories" name="calories" type="number" step="10">
+            </div>
+            <div class="field">
+              <label for="energy">精力 1-5</label>
+              <input id="energy" name="energy" type="number" min="1" max="5" step="1">
+            </div>
+            <div class="field">
+              <label for="hunger">饥饿 1-5</label>
+              <input id="hunger" name="hunger" type="number" min="1" max="5" step="1">
+            </div>
+            <div class="field">
+              <label for="mood">情绪 1-5</label>
+              <input id="mood" name="mood" type="number" min="1" max="5" step="1">
+            </div>
+            <div class="field">
+              <label for="pain">疼痛 0-5</label>
+              <input id="pain" name="pain" type="number" min="0" max="5" step="1">
+            </div>
+          </div>
+        </details>
+
+        <div class="form-grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="notes">备注</label>
+            <textarea id="notes" name="notes" placeholder="训练、饮食、睡眠或身体感受"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary">保存记录</button>
+          <button type="button" id="todayButton">填入今天日期</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">记录明细</h2>
+      <div id="tableArea"></div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "fatLossCoachTracking";
+    const $ = (id) => document.getElementById(id);
+
+    const DEMO = {
+      schema_version: "1.0",
+      user: {
+        age: 29,
+        sex: "male",
+        height_cm: 165,
+        initial_weight_kg: 60,
+        target_weight_kg: 55
+      },
+      records: [
+        { date: "2026-08-12", weight_kg: 60.0, body_fat_pct: 22.0, waist_cm: 78.0, neck_cm: 38.0, sleep_hours: 7.5, water_ml: 1800, fasting_window_hours: 18, steps: 8000, training_minutes: 60, protein_g: 120, calories: 1600, energy: 4, hunger: 3, mood: 4, pain: 0, notes: "第一天基线记录" },
+        { date: "2026-08-13", weight_kg: 59.6, body_fat_pct: 21.8, waist_cm: 77.8, neck_cm: 38.0, sleep_hours: 7.0, water_ml: 1900, fasting_window_hours: 18, steps: 9200, training_minutes: 55, protein_g: 118, calories: 1580, energy: 4, hunger: 3, mood: 4, pain: 0, notes: "跑步日，心率控制稳定" },
+        { date: "2026-08-14", weight_kg: 59.2, body_fat_pct: 21.6, waist_cm: 77.5, neck_cm: 38.0, sleep_hours: 7.5, water_ml: 1750, fasting_window_hours: 18, steps: 7800, training_minutes: 45, protein_g: 121, calories: 1620, energy: 5, hunger: 2, mood: 5, pain: 0, notes: "居家推拉腿训练" }
+      ]
+    };
+
+    const NUMBER_FIELDS = [
+      "weight_kg", "body_fat_pct", "waist_cm", "neck_cm", "sleep_hours",
+      "water_ml", "fasting_window_hours", "steps", "training_minutes",
+      "protein_g", "calories", "energy", "hunger", "mood", "pain"
+    ];
+
+    let state = {
+      schema_version: "1.0",
+      user: {},
+      records: []
+    };
+
+    function todayString() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function numberOrNull(value) {
+      if (value === "" || value === null || value === undefined) return null;
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function normalizeData(input) {
+      if (!input || typeof input !== "object") {
+        throw new Error("JSON 必须是对象。");
+      }
+      if (!Array.isArray(input.records)) {
+        throw new Error("缺少 records 数组。");
+      }
+      const user = input.user && typeof input.user === "object" ? input.user : {};
+      const records = input.records
+        .filter((record) => record && record.date)
+        .map((record) => {
+          const clean = { date: String(record.date), notes: String(record.notes || "") };
+          NUMBER_FIELDS.forEach((field) => {
+            clean[field] = numberOrNull(record[field]);
+          });
+          return clean;
+        })
+        .sort((a, b) => a.date.localeCompare(b.date));
+      return {
+        schema_version: input.schema_version || "1.0",
+        user,
+        records
+      };
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (error) {
+        console.warn("无法保存到 localStorage", error);
+      }
+    }
+
+    function setState(next) {
+      state = normalizeData(next);
+      saveState();
+      render();
+    }
+
+    function loadStored() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) setState(JSON.parse(raw));
+      } catch (error) {
+        console.warn("无法读取 localStorage", error);
+      }
+    }
+
+    function importFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          setState(JSON.parse(String(reader.result)));
+        } catch (error) {
+          alert("JSON 导入失败：" + error.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      downloadBlob(blob, "fat-loss-tracking.json");
+    }
+
+    function exportCSV() {
+      const headers = ["date", ...NUMBER_FIELDS, "notes"];
+      const rows = state.records.map((record) => {
+        return headers.map((key) => {
+          const value = record[key];
+          if (value === null || value === undefined) return "";
+          return String(value).includes(",") ? `"${String(value).replace(/"/g, '""')}"` : String(value);
+        }).join(",");
+      });
+      const csv = [headers.join(","), ...rows].join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      downloadBlob(blob, "fat-loss-tracking.csv");
+    }
+
+    function renderProfile() {
+      const user = state.user || {};
+      const parts = [];
+      if (user.age) parts.push(`年龄 ${user.age}`);
+      if (user.sex) parts.push(user.sex === "male" ? "男性" : user.sex === "female" ? "女性" : user.sex);
+      if (user.height_cm) parts.push(`身高 ${user.height_cm} cm`);
+      if (user.initial_weight_kg) parts.push(`初始体重 ${user.initial_weight_kg} kg`);
+      if (user.target_weight_kg) parts.push(`目标体重 ${user.target_weight_kg} kg`);
+      $("profileText").textContent = parts.join(" · ");
+    }
+
+    function average(values) {
+      const filtered = values.filter((v) => v !== null);
+      if (!filtered.length) return null;
+      return filtered.reduce((sum, value) => sum + value, 0) / filtered.length;
+    }
+
+    function renderMetrics() {
+      const records = state.records;
+      if (!records.length) {
+        $("metrics").innerHTML = '<div class="empty" style="grid-column:1/-1;">还没有记录，请导入 JSON 或添加第一条记录。</div>';
+        return;
+      }
+
+      const first = records[0];
+      const latest = records[records.length - 1];
+      const change = latest.weight_kg !== null && first.weight_kg !== null ? latest.weight_kg - first.weight_kg : null;
+      const lastSeven = records.slice(-7);
+      const sevenDayWeight = average(lastSeven.map((record) => record.weight_kg));
+      const bodyFat = latest.body_fat_pct;
+      const sleepAvg = average(lastSeven.map((record) => record.sleep_hours));
+
+      const metrics = [
+        { label: "最新体重", value: latest.weight_kg === null ? "--" : `${latest.weight_kg} kg`, note: change === null ? "" : `${change >= 0 ? "+" : ""}${change.toFixed(1)} kg` },
+        { label: "7 日平均体重", value: sevenDayWeight === null ? "--" : `${sevenDayWeight.toFixed(1)} kg`, note: "看趋势，不看单日" },
+        { label: "最新体脂率", value: bodyFat === null ? "--" : `${bodyFat}%`, note: bodyFat === null ? "未记录" : "可选指标" },
+        { label: "近 7 日睡眠", value: sleepAvg === null ? "--" : `${sleepAvg.toFixed(1)} 小时`, note: "建议至少 7 小时" }
+      ];
+
+      $("metrics").innerHTML = metrics.map((metric) => `
+        <div class="metric">
+          <div class="metric-label">${metric.label}</div>
+          <div class="metric-value">${metric.value}</div>
+          <div class="metric-note">${metric.note}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderTable() {
+      const records = state.records;
+      if (!records.length) {
+        $("tableArea").innerHTML = '<div class="empty">暂无记录。</div>';
+        return;
+      }
+
+      const rows = records.map((record, index) => {
+        const previous = index > 0 ? records[index - 1] : null;
+        const change = previous && record.weight_kg !== null && previous.weight_kg !== null
+          ? record.weight_kg - previous.weight_kg
+          : null;
+        return `
+          <tr>
+            <td>${record.date}</td>
+            <td>${record.weight_kg ?? "--"}</td>
+            <td>${change === null ? "--" : `${change >= 0 ? "+" : ""}${change.toFixed(1)}`}</td>
+            <td>${record.body_fat_pct ?? "--"}</td>
+            <td>${record.sleep_hours ?? "--"}</td>
+            <td>${record.training_minutes ?? "--"}</td>
+            <td>${record.notes || ""}</td>
+          </tr>
+        `;
+      }).join("");
+
+      $("tableArea").innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>体重 kg</th>
+                <th>变化</th>
+                <th>体脂率 %</th>
+                <th>睡眠 h</th>
+                <th>训练 min</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderChart() {
+      const wrap = $("chartWrap");
+      const canvas = $("chartCanvas");
+      const tooltip = $("chartTooltip");
+      const records = state.records;
+      const width = wrap.clientWidth || 600;
+      const height = 300;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(1, Math.floor(width * dpr));
+      canvas.height = Math.max(1, Math.floor(height * dpr));
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      if (!records.length) return;
+
+      const padding = { top: 18, right: 48, bottom: 38, left: 52 };
+      const plotWidth = Math.max(1, width - padding.left - padding.right);
+      const plotHeight = Math.max(1, height - padding.top - padding.bottom);
+      const weights = records.map((record) => record.weight_kg).filter((v) => v !== null);
+      const fats = records.map((record) => record.body_fat_pct).filter((v) => v !== null);
+
+      const xFor = (index) => padding.left + (records.length === 1 ? plotWidth / 2 : index * (plotWidth / (records.length - 1)));
+
+      function drawAxes(hasWeight, hasFat) {
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--border").trim();
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim();
+        ctx.lineWidth = 1;
+        ctx.font = "12px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.beginPath();
+        ctx.moveTo(padding.left, padding.top);
+        ctx.lineTo(padding.left, padding.top + plotHeight);
+        ctx.lineTo(padding.left + plotWidth, padding.top + plotHeight);
+        ctx.stroke();
+
+        if (hasWeight) {
+          const minWeight = Math.min(...weights);
+          const maxWeight = Math.max(...weights);
+          const pad = (maxWeight - minWeight) * 0.15 || 1;
+          const weightMin = minWeight - pad;
+          const weightMax = maxWeight + pad;
+          for (let i = 0; i <= 4; i++) {
+            const value = weightMin + (weightMax - weightMin) * (i / 4);
+            const y = padding.top + plotHeight - (value - weightMin) / (weightMax - weightMin) * plotHeight;
+            ctx.fillText(value.toFixed(1), 6, y + 4);
+          }
+        }
+
+        if (hasFat) {
+          const minFat = Math.min(...fats);
+          const maxFat = Math.max(...fats);
+          const pad = (maxFat - minFat) * 0.15 || 1;
+          const fatMin = minFat - pad;
+          const fatMax = maxFat + pad;
+          for (let i = 0; i <= 4; i++) {
+            const value = fatMin + (fatMax - fatMin) * (i / 4);
+            const y = padding.top + plotHeight - (value - fatMin) / (fatMax - fatMin) * plotHeight;
+            ctx.fillText(value.toFixed(1), width - padding.right + 8, y + 4);
+          }
+        }
+
+        const labelCount = Math.min(records.length, 5);
+        for (let i = 0; i < labelCount; i++) {
+          const index = Math.round(i * (records.length - 1) / (labelCount - 1 || 1));
+          const x = xFor(index);
+          ctx.fillText(records[index].date.slice(5), x - 18, padding.top + plotHeight + 20);
+        }
+      }
+
+      function drawWeightLine() {
+        if (weights.length < 2) {
+          if (weights.length === 1) {
+            const y = padding.top + plotHeight / 2;
+            ctx.beginPath();
+            ctx.arc(xFor(records.findIndex((r) => r.weight_kg !== null)), y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          return;
+        }
+        const minWeight = Math.min(...weights);
+        const maxWeight = Math.max(...weights);
+        const pad = (maxWeight - minWeight) * 0.15 || 1;
+        const weightMin = minWeight - pad;
+        const weightMax = maxWeight + pad;
+        const color = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        let started = false;
+        records.forEach((record, index) => {
+          if (record.weight_kg === null) return;
+          const x = xFor(index);
+          const y = padding.top + plotHeight - (record.weight_kg - weightMin) / (weightMax - weightMin) * plotHeight;
+          if (!started) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+          started = true;
+        });
+        ctx.stroke();
+        records.forEach((record, index) => {
+          if (record.weight_kg === null) return;
+          const x = xFor(index);
+          const y = padding.top + plotHeight - (record.weight_kg - weightMin) / (weightMax - weightMin) * plotHeight;
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      function drawFatLine() {
+        const validFats = records.filter((record) => record.body_fat_pct !== null);
+        if (validFats.length < 2) return;
+        const minFat = Math.min(...fats);
+        const maxFat = Math.max(...fats);
+        const pad = (maxFat - minFat) * 0.15 || 1;
+        const fatMin = minFat - pad;
+        const fatMax = maxFat + pad;
+        const color = getComputedStyle(document.documentElement).getPropertyValue("--warning").trim();
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        let started = false;
+        records.forEach((record, index) => {
+          if (record.body_fat_pct === null) return;
+          const x = xFor(index);
+          const y = padding.top + plotHeight - (record.body_fat_pct - fatMin) / (fatMax - fatMin) * plotHeight;
+          if (!started) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+          started = true;
+        });
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      const hasWeight = weights.length > 0;
+      const hasFat = fats.length > 0;
+      drawAxes(hasWeight, hasFat);
+      drawWeightLine();
+      drawFatLine();
+
+      canvas.onmousemove = (event) => {
+        if (!records.length) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const index = records.length === 1 ? 0 : Math.max(0, Math.min(records.length - 1, Math.round((x - padding.left) / (plotWidth / (records.length - 1)))));
+        const record = records[index];
+        tooltip.style.display = "block";
+        tooltip.style.left = Math.min(Math.max(xFor(index), 0), width - 140) + "px";
+        tooltip.style.top = "8px";
+        tooltip.innerHTML = `${record.date}<br>体重：${record.weight_kg ?? "--"} kg<br>体脂率：${record.body_fat_pct ?? "--"}%`;
+      };
+      canvas.onmouseleave = () => {
+        tooltip.style.display = "none";
+      };
+    }
+
+    function render() {
+      renderProfile();
+      renderMetrics();
+      renderTable();
+      renderChart();
+    }
+
+    function gatherForm() {
+      const date = $("date").value || todayString();
+      const record = { date, notes: $("notes").value.trim() };
+      NUMBER_FIELDS.forEach((field) => {
+        record[field] = numberOrNull($(field).value);
+      });
+      if (record.weight_kg === null) {
+        throw new Error("体重不能为空。");
+      }
+      return record;
+    }
+
+    function saveRecord(event) {
+      event.preventDefault();
+      try {
+        const record = gatherForm();
+        const nextRecords = state.records.filter((item) => item.date !== record.date);
+        nextRecords.push(record);
+        nextRecords.sort((a, b) => a.date.localeCompare(b.date));
+        setState({ ...state, records: nextRecords });
+        $("recordForm").reset();
+        $("date").value = todayString();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function init() {
+      $("date").value = todayString();
+      $("importButton").addEventListener("click", () => $("fileInput").click());
+      $("fileInput").addEventListener("change", importFile);
+      $("exportJsonButton").addEventListener("click", exportJSON);
+      $("exportCsvButton").addEventListener("click", exportCSV);
+      $("sampleButton").addEventListener("click", () => setState(DEMO));
+      $("clearButton").addEventListener("click", () => {
+        if (confirm("确认清空当前数据？")) {
+          setState({ schema_version: "1.0", user: {}, records: [] });
+        }
+      });
+      $("todayButton").addEventListener("click", () => {
+        $("date").value = todayString();
+      });
+      $("recordForm").addEventListener("submit", saveRecord);
+
+      const stored = loadStored();
+      if (!stored && !state.records.length) render();
+
+      const resizeObserver = new ResizeObserver(() => renderChart());
+      resizeObserver.observe($("chartWrap"));
+      window.addEventListener("resize", () => renderChart());
+      render();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>

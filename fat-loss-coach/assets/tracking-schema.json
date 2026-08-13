@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "user": {
+    "age": 29,
+    "sex": "male",
+    "height_cm": 165,
+    "initial_weight_kg": 60,
+    "target_weight_kg": 55
+  },
+  "records": [
+    {
+      "date": "2026-08-12",
+      "weight_kg": 60.0,
+      "body_fat_pct": 22.0,
+      "waist_cm": 78.0,
+      "neck_cm": 38.0,
+      "sleep_hours": 7.5,
+      "water_ml": 1800,
+      "fasting_window_hours": 18,
+      "steps": 8000,
+      "training_minutes": 60,
+      "protein_g": 120,
+      "calories": 1600,
+      "energy": 4,
+      "hunger": 3,
+      "mood": 4,
+      "pain": 0,
+      "notes": "第一天基线记录"
+    },
+    {
+      "date": "2026-08-13",
+      "weight_kg": 59.6,
+      "body_fat_pct": 21.8,
+      "waist_cm": 77.8,
+      "neck_cm": 38.0,
+      "sleep_hours": 7.0,
+      "water_ml": 1900,
+      "fasting_window_hours": 18,
+      "steps": 9200,
+      "training_minutes": 55,
+      "protein_g": 118,
+      "calories": 1580,
+      "energy": 4,
+      "hunger": 3,
+      "mood": 4,
+      "pain": 0,
+      "notes": "跑步日，心率控制稳定"
+    },
+    {
+      "date": "2026-08-14",
+      "weight_kg": 59.2,
+      "body_fat_pct": 21.6,
+      "waist_cm": 77.5,
+      "neck_cm": 38.0,
+      "sleep_hours": 7.5,
+      "water_ml": 1750,
+      "fasting_window_hours": 18,
+      "steps": 7800,
+      "training_minutes": 45,
+      "protein_g": 121,
+      "calories": 1620,
+      "energy": 5,
+      "hunger": 2,
+      "mood": 5,
+      "pain": 0,
+      "notes": "居家推拉腿训练"
+    }
+  ]
+}

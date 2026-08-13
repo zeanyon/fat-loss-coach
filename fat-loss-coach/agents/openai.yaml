@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fat Loss Coach"
+  short_description: "Sustainable fat-loss plans, workouts, fasting, and habits"
+  default_prompt: "Use $fat-loss-coach to create my personalized sustainable fat-loss plan."
