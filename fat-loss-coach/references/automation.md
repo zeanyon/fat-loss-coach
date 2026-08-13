@@ -19,20 +19,19 @@ Then ask the user to provide today's values and append them.
 Use this prompt shape:
 
 ```text
-Good morning. Reply with today's:
+早上好。今天不急着追求完美，先告诉我：
 
-- Weight (kg)
-- Body-fat percentage (optional)
-- Waist (cm, optional)
-- Neck (cm, optional)
-- Sleep hours
-- Water intake (ml)
-- Fasting window followed
-- Meals and diet adherence score
-- Steps and training minutes
-- Energy, hunger, mood, and pain scores
+- 体重（kg）
+- 体脂率（可选）
+- 腰围和颈围（可选）
+- 睡眠小时
+- 饮水（ml）
+- 断食窗口是否完成
+- 饮食执行度评分
+- 步数和训练分钟
+- 精力、饥饿、情绪和疼痛评分
 
-Keep it short. After I reply, summarize the 7-day trend and give one specific action for today.
+慢慢来，发多少都可以。我会帮你把今天的数字放进趋势里，然后给你一个今天就能做的小行动。
 ```
 
 ## Append Command

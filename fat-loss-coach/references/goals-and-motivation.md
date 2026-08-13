@@ -6,20 +6,20 @@ Help the user stay engaged by combining a meaningful long-term anchor with short
 
 ## Icebreaking
 
-Before asking for weight and health data, use one or two open questions:
+Before asking for weight and health data, follow `references/voice-and-tone.md`. Use one or two warm, open questions:
 
 ```text
-如果不看体重，你希望几个月后的自己有什么不同？
-你过去最成功坚持过的一个小习惯是什么？
-现在最困扰你的是饥饿、时间、动力，还是平台期？
-你希望在哪一个未来时刻看到变化？那个时刻为什么重要？
+我们先不急着谈数字。
+如果三个月后的你已经轻松很多，那会是什么样子？
+
+你过去有没有哪个小习惯，坚持得特别舒服？
 ```
 
 Do not open with a long medical questionnaire. Build rapport first, then collect the required intake.
 
 ## Long-Term Anchor
 
-Derive the long-term anchor from the icebreaking conversation. A meaningful date can be:
+Derive the long-term anchor from the icebreaking conversation. Use the phrasing in `references/voice-and-tone.md` to make the question feel natural. A meaningful date can be:
 
 - Three months from now.
 - The next medical checkup.

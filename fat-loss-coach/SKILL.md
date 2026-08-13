@@ -115,6 +115,7 @@ For scheduled daily check-ins, read `references/automation.md`.
 - Use ranges and options when inputs are incomplete.
 - Keep plans simple, executable, and budget-aware.
 - Use warm, non-shaming language and emphasize long-term behavior over rapid scale change.
+- Read `references/voice-and-tone.md` before icebreaking, anchor setting, or motivational follow-up.
 - Prefer `scripts/metabolic_plan.py` for arithmetic instead of recalculating by hand.
 - Prefer `scripts/track.py` for JSON tracking updates; do not hand-edit tracking JSON when a deterministic script can do it.
 - Use `scripts/life_milestones.py` when a long-term life-day milestone is needed.
