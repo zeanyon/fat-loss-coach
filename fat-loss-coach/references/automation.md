@@ -28,6 +28,7 @@ Good morning. Reply with today's:
 - Sleep hours
 - Water intake (ml)
 - Fasting window followed
+- Meals and diet adherence score
 - Steps and training minutes
 - Energy, hunger, mood, and pain scores
 

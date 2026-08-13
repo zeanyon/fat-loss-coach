@@ -43,6 +43,16 @@ Output:
 
 Do not use BMR as the daily intake. Use TDEE minus a controlled deficit.
 
+### After The Initial Plan
+
+Do not stop at the first plan. Before ending the session, complete these steps:
+
+1. Confirm a long-term anchor from the icebreaking conversation, or ask for one if missing.
+2. Generate or update `assets/goal_profile.md` with that anchor and the short-term goals.
+3. Ask the user whether they want a daily check-in, and if yes, set up or explain the automation flow from `references/automation.md`.
+4. Ensure the tracking source is ready: either create `tracking.json` with `scripts/track.py` or tell the user to use `assets/dashboard.html`.
+5. Confirm what each daily check-in should collect: weight, optional body-fat percentage, sleep, water, fasting window, meals, training, hunger, energy, mood, and pain.
+
 ## Safety Gates
 
 Before any output:

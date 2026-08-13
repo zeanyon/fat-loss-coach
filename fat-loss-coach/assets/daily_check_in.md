@@ -13,6 +13,7 @@ Recovery score (1-5):
 Water intake:
 Fasting window followed:
 Meals logged:
+Diet adherence (1-5):
 
 Movement completed:
 Steps or training minutes:
