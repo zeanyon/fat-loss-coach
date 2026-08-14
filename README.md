@@ -2,6 +2,12 @@
 
 一个可持续减脂与体重管理 skill，把个人减重经验整理成可复用的评估、计划、记录和长期跟进流程。
 
+## 作者
+
+zeanyon
+
+半年减重 100 斤的真实经历整理成这套 skill。
+
 ## 我的减重记录
 
 我的减重视频：[Bilibili 减重视频](https://www.bilibili.com/video/BV1SyxSejEBn/?spm_id_from=333.1387.homepage.video_card.click&vd_source=33b2ad8a522d5164764c5bf6720bbb69)
